@@ -108,9 +108,24 @@ export class LogCollector {
       return notes;
     }
 
-    // デイリーノートディレクトリを探索
-    const dailyNotesPath = path.join(this.obsidianVaultPath, 'daily');
-    if (!fs.existsSync(dailyNotesPath)) {
+    // デイリーノートディレクトリの候補パス（複数パターン対応）
+    const dailyPaths = [
+      'daily',
+      'Daily Notes',
+      'Notes/daily',
+      'papa/daily',
+    ];
+
+    let dailyNotesPath: string | null = null;
+    for (const subPath of dailyPaths) {
+      const candidate = path.join(this.obsidianVaultPath, subPath);
+      if (fs.existsSync(candidate)) {
+        dailyNotesPath = candidate;
+        break;
+      }
+    }
+
+    if (!dailyNotesPath) {
       return notes;
     }
 

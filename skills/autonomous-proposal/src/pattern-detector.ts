@@ -214,6 +214,7 @@ export class PatternDetector {
     return message
       .toLowerCase()
       .replace(/file:\/\/[^\s]+/g, 'FILE_PATH') // ファイルパスを置換
+      .replace(/https?:\/\/[^\s]+/g, 'URL') // HTTP/HTTPS URLを置換
       .replace(/\d{4}-\d{2}-\d{2}/g, 'DATE') // 日付を置換
       .replace(/\d{2}:\d{2}:\d{2}/g, 'TIME') // 時刻を置換
       .trim();

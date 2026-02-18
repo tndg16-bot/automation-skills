@@ -14,18 +14,24 @@ export interface Pattern {
   threshold: number;
   data: any;
   detectedAt: Date;
+  relatedTasks?: Task[];
+  relatedErrors?: ErrorLog[];
 }
 
 export interface Task {
   name: string;
+  description: string;
   steps: string[];
   executedAt: Date;
+  timestamp: Date;
 }
 
 export interface ErrorLog {
+  type: string;
   message: string;
   stackTrace?: string;
   occurredAt: Date;
+  timestamp: Date;
   context?: string;
 }
 
@@ -93,6 +99,7 @@ export class PatternDetector {
             tasks: taskDetails.get(name),
           },
           detectedAt: new Date(),
+          relatedTasks: taskDetails.get(name),
         });
       }
     });
@@ -121,6 +128,7 @@ export class PatternDetector {
             executedAt: task.executedAt,
           },
           detectedAt: new Date(),
+          relatedTasks: [task],
         });
       }
     });
@@ -161,6 +169,7 @@ export class PatternDetector {
             errors: errorDetails.get(message),
           },
           detectedAt: new Date(),
+          relatedErrors: errorDetails.get(message),
         });
       }
     });

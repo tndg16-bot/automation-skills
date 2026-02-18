@@ -12,6 +12,7 @@
 import { PatternDetector, Pattern, Task, ErrorLog } from './pattern-detector';
 import { LogCollector } from './log-collector';
 import { SkillGenerator, SkillConfig, GeneratedSkill } from './skill-generator';
+import { ProposalNotifier, NotificationConfig } from './notification';
 
 export interface Proposal {
   id: string;
@@ -28,6 +29,7 @@ export interface AutonomousProposalConfig {
   discordChannels?: string[];
   githubRepos?: string[];
   autoGenerate?: boolean;
+  notification?: NotificationConfig;
 }
 
 export class AutonomousProposal {
@@ -35,6 +37,7 @@ export class AutonomousProposal {
   private detector: PatternDetector;
   private collector: LogCollector;
   private generator: SkillGenerator;
+  private notifier?: ProposalNotifier;
   private proposals: Proposal[] = [];
 
   constructor(config: AutonomousProposalConfig) {
@@ -46,6 +49,10 @@ export class AutonomousProposal {
       githubRepos: config.githubRepos,
     });
     this.generator = new SkillGenerator(config.skillsDir);
+
+    if (config.notification) {
+      this.notifier = new ProposalNotifier(config.notification);
+    }
   }
 
   /**
@@ -84,7 +91,13 @@ export class AutonomousProposal {
       }
     }
 
-    // 5. 統計情報を表示
+    // 5. 提案をDiscordに通知 (#58)
+    if (this.notifier && this.proposals.length > 0) {
+      console.log('📢 提案をDiscordに通知中...');
+      await this.notifier.notifyProposals(this.proposals);
+    }
+
+    // 6. 統計情報を表示
     const stats = this.detector.getStats();
     console.log('\n📊 統計情報:');
     console.log(`  - 総タスク数: ${stats.totalTasks}`);
@@ -260,3 +273,4 @@ export default AutonomousProposal;
 export { PatternDetector, Pattern, Task, ErrorLog } from './pattern-detector';
 export { LogCollector, DiscordLog, DiscordMessage, ObsidianNote, GitHubIssue } from './log-collector';
 export { SkillGenerator, SkillConfig, GeneratedSkill } from './skill-generator';
+export { ProposalNotifier, NotificationConfig, NotificationMessage, NotificationField } from './notification';

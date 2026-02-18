@@ -182,18 +182,24 @@ export class LogCollector {
     for (const note of notes) {
       // タスクをTask形式に変換
       for (const task of note.tasks) {
+        const timestamp = note.metadata.date || new Date();
         tasks.push({
           name: task,
+          description: task,
           steps: [task], // 単一ステップとして扱う
-          executedAt: note.metadata.date || new Date(),
+          executedAt: timestamp,
+          timestamp,
         });
       }
 
       // エラーをErrorLog形式に変換
       for (const error of note.errors) {
+        const timestamp = note.metadata.date || new Date();
         errors.push({
+          type: 'obsidian',
           message: error,
-          occurredAt: note.metadata.date || new Date(),
+          occurredAt: timestamp,
+          timestamp,
           context: note.path,
         });
       }
